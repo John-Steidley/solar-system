@@ -33,6 +33,16 @@ fn main() {
         blue: 0.0,
         satelites: Some(vec![
             Body{
+                name: "mercury",
+                radius:0.010,
+                orbit_period: 500,
+                orbit_radius: 0.2,
+                red: 0.2,
+                green: 0.2,
+                blue: 0.2,
+                satelites: None,
+            },
+            Body{
                 name: "venus",
                 radius: 0.025,
                 orbit_period: 3000,
@@ -62,6 +72,36 @@ fn main() {
                         satelites: None,
                     }
                 ]),
+            },
+            Body{
+                name: "mars",
+                radius: 0.013,
+                orbit_period: 4000,
+                orbit_radius: 0.7,
+                red: 1.0,
+                green: 0.3,
+                blue: 0.0,
+                satelites: None,
+            },
+            Body{
+                name: "jupiter",
+                radius:0.080,
+                orbit_period: 10000,
+                orbit_radius: 1.1,
+                red: 0.5,
+                green: 0.3,
+                blue: 0.0,
+                satelites:None,
+            },
+            Body{
+                name: "saturn",
+                radius: 0.060,
+                orbit_period: 12000,
+                orbit_radius:1.3,
+                red: 0.5,
+                green: 0.3,
+                blue:0.0,
+                satelites:None,
             },
         ]),
     };
