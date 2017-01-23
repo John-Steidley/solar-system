@@ -1,48 +1,107 @@
 extern crate kiss3d;
 extern crate nalgebra as na;
 
+use std::collections::HashMap;
+use kiss3d::window::Window;
+use kiss3d::scene::SceneNode;
 use na::Vector3;
+
+struct Body<'a> {
+    name: &'a str,
+    radius: f32,
+    orbit_period: u64,
+    orbit_radius: f32,
+    red: f32,
+    green: f32,
+    blue: f32,
+    satelites: Option<Vec<Body<'a>>>,
+}
+
 fn main() {
-    let mut window = kiss3d::window::Window::new("Solar system");
+    let mut window = Window::new("Solar system");
     window.set_light(kiss3d::light::Light::StickToCamera);
 
-    let sun_radius = 0.1f32; // arbitrary unit to fit in initial camera view
-    let mut sun = window.add_sphere(sun_radius);
-    sun.set_color(0.95, 0.7, 0.0);
+    let mut nodes = HashMap::new();
 
-    let venus_radius = sun_radius * 0.25;
-    let mut venus = window.add_sphere(venus_radius);
-    venus.set_color(1.0, 0.3, 0.0);
+    let solar_system: Body = Body{
+        name: "sun",
+        radius: 0.1,
+        orbit_period: 1,
+        orbit_radius: 0.0,
+        red: 0.95,
+        green: 0.7,
+        blue: 0.0,
+        satelites: Some(vec![
+            Body{
+                name: "venus",
+                radius: 0.025,
+                orbit_period: 3000,
+                orbit_radius: 0.3,
+                red: 1.0,
+                green: 0.3,
+                blue: 0.0,
+                satelites: None,
+            },
+            Body{
+                name: "earth",
+                radius: 0.025,
+                orbit_period: 5000,
+                orbit_radius: 0.5,
+                red: 0.0,
+                green: 0.8,
+                blue: 1.0,
+                satelites: Some(vec![
+                    Body{
+                        name: "the moon",
+                        radius: 0.005,
+                        orbit_period: 500,
+                        orbit_radius: 0.075,
+                        red: 0.2,
+                        green: 0.2,
+                        blue: 0.2,
+                        satelites: None,
+                    }
+                ]),
+            },
+        ]),
+    };
 
-    let earth_radius = sun_radius * 0.25;
-    let mut earth = window.add_sphere(earth_radius);
-    earth.set_color(0.0, 0.8, 1.0);
-
-    let moon_radius = earth_radius * 0.25;
-    let mut moon = window.add_sphere(moon_radius);
-    moon.set_color(0.2, 0.2, 0.2);
-
-    let distance_sun_to_venus = sun_radius * 3.;
-    let distance_sun_to_earth = sun_radius * 5.0;
-    let distance_earth_to_moon = earth_radius * 2.0;
+    add_bodies(&mut window, &solar_system, &mut nodes);
 
     let mut day = 1;
     loop {
         day += 1;
-        let sun_coords = Vector3::new(0.0, 0.0, 0.0);
+        let origin = Vector3::new(0.0, 0.0, 0.0);
 
-        let venus_coords = get_coordinates(day, 3000, distance_sun_to_venus, &sun_coords);
-        let earth_coords = get_coordinates(day, 5000, distance_sun_to_earth, &sun_coords);
-        let moon_coords = get_coordinates(day, 500, distance_earth_to_moon, &earth_coords);
-
-        venus.set_local_translation(venus_coords);
-        earth.set_local_translation(earth_coords);
-        moon.set_local_translation(moon_coords);
+        move_bodies(&mut nodes, &solar_system, &origin, day);
 
         if !window.render() {
             break;
         }
     }
+}
+
+fn add_bodies(window: &mut Window, body: &Body, nodes: &mut HashMap<String, SceneNode>) {
+    let mut handle = window.add_sphere(body.radius);
+    handle.set_color(body.red, body.green, body.blue);
+    nodes.insert(body.name.to_string(), handle);
+    if let Some(ref satelites) = body.satelites {
+        for b in satelites {
+            add_bodies(window, &b, nodes);
+        }
+    }
+}
+
+fn move_bodies(nodes: &mut HashMap<String, SceneNode>, body: &Body, origin: &Vector3<f32>, day: u64) {
+    let coords = get_coordinates(day, body.orbit_period, body.orbit_radius, origin);
+    let mut handle = nodes.remove(&body.name.to_string()).unwrap();
+    if let Some(ref satelites) = body.satelites {
+        for b in satelites {
+            move_bodies(nodes, &b, &coords, day);
+        }
+    }
+    handle.set_local_translation(coords);
+    nodes.insert(body.name.to_string(), handle);
 }
 
 fn get_coordinates(day: u64, orbit_period: u64, scale: f32, origin: &Vector3<f32>) -> Vector3<f32> {
