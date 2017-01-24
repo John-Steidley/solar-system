@@ -101,13 +101,33 @@ fn main() {
                 blue:0.0,
                 satelites:None,
             },
+            Body{
+                name: "Uranus",
+                radius: 0.045,
+                orbit_period: 30000,
+                orbit_radius: 2.6,
+                red: 0.3,
+                green: 0.8,
+                blue: 1.0,
+                satelites:None,
+            },
+            Body{
+                name:"Neptune",
+                radius: 0.045,
+                orbit_period: 35000,
+                orbit_radius: 2.9,
+                red: 0.0,
+                green: 0.0,
+                blue: 0.5,
+                satelites:None,
+            },
         ]),
     };
 
     let mut nodes = HashMap::new();
     add_bodies(&mut window, &solar_system, &mut nodes);
     let origin = Vector3::new(0.0, 0.0, 0.0);
-    let mut day = 0;
+    let mut day = 78920;
     while window.render() {
         day += 1;
         move_bodies(&mut nodes, &solar_system, &origin, day);
