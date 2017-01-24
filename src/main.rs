@@ -21,10 +21,8 @@ fn main() {
     let mut window = Window::new("Solar system");
     window.set_light(kiss3d::light::Light::StickToCamera);
 
-    let mut nodes = HashMap::new();
-
     let solar_system: Body = Body{
-        name: "sun",
+        name: "Sun",
         radius: 0.1,
         orbit_period: 1,
         orbit_radius: 0.0,
@@ -33,7 +31,7 @@ fn main() {
         blue: 0.0,
         satelites: Some(vec![
             Body{
-                name: "mercury",
+                name: "Mercury",
                 radius:0.010,
                 orbit_period: 500,
                 orbit_radius: 0.2,
@@ -43,7 +41,7 @@ fn main() {
                 satelites: None,
             },
             Body{
-                name: "venus",
+                name: "Venus",
                 radius: 0.025,
                 orbit_period: 3000,
                 orbit_radius: 0.3,
@@ -53,7 +51,7 @@ fn main() {
                 satelites: None,
             },
             Body{
-                name: "earth",
+                name: "Earth",
                 radius: 0.025,
                 orbit_period: 5000,
                 orbit_radius: 0.5,
@@ -62,7 +60,7 @@ fn main() {
                 blue: 1.0,
                 satelites: Some(vec![
                     Body{
-                        name: "the moon",
+                        name: "The Moon",
                         radius: 0.005,
                         orbit_period: 500,
                         orbit_radius: 0.075,
@@ -74,7 +72,7 @@ fn main() {
                 ]),
             },
             Body{
-                name: "mars",
+                name: "Mars",
                 radius: 0.013,
                 orbit_period: 4000,
                 orbit_radius: 0.7,
@@ -84,7 +82,7 @@ fn main() {
                 satelites: None,
             },
             Body{
-                name: "jupiter",
+                name: "Jupiter",
                 radius:0.080,
                 orbit_period: 10000,
                 orbit_radius: 1.1,
@@ -94,7 +92,7 @@ fn main() {
                 satelites:None,
             },
             Body{
-                name: "saturn",
+                name: "Saturn",
                 radius: 0.060,
                 orbit_period: 12000,
                 orbit_radius:1.3,
@@ -106,18 +104,13 @@ fn main() {
         ]),
     };
 
+    let mut nodes = HashMap::new();
     add_bodies(&mut window, &solar_system, &mut nodes);
-
-    let mut day = 1;
-    loop {
+    let origin = Vector3::new(0.0, 0.0, 0.0);
+    let mut day = 0;
+    while window.render() {
         day += 1;
-        let origin = Vector3::new(0.0, 0.0, 0.0);
-
         move_bodies(&mut nodes, &solar_system, &origin, day);
-
-        if !window.render() {
-            break;
-        }
     }
 }
 
