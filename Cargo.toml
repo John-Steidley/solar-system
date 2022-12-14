@@ -4,5 +4,4 @@ version = "0.1.0"
 authors = ["John Steidley <johnsteidley@gmail.com>"]
 
 [dependencies]
-kiss3d = "0.7.0"
-nalgebra = "0.9"
+kiss3d = "0.35.0"

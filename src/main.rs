@@ -1,10 +1,10 @@
 extern crate kiss3d;
-extern crate nalgebra as na;
 
 use std::collections::HashMap;
 use kiss3d::window::Window;
 use kiss3d::scene::SceneNode;
-use na::Vector3;
+use kiss3d::nalgebra::Translation3;
+
 
 struct Body<'a> {
     name: &'a str,
@@ -126,7 +126,7 @@ fn main() {
 
     let mut nodes = HashMap::new();
     add_bodies(&mut window, &solar_system, &mut nodes);
-    let origin = Vector3::new(0.0, 0.0, 0.0);
+    let origin = Translation3::new(0.0, 0.0, 0.0);
     let mut day = 78920;
     while window.render() {
         day += 1;
@@ -145,7 +145,7 @@ fn add_bodies(window: &mut Window, body: &Body, nodes: &mut HashMap<String, Scen
     }
 }
 
-fn move_bodies(nodes: &mut HashMap<String, SceneNode>, body: &Body, origin: &Vector3<f32>, day: u64) {
+fn move_bodies(nodes: &mut HashMap<String, SceneNode>, body: &Body, origin: &Translation3<f32>, day: u64) {
     let coords = get_coordinates(day, body.orbit_period, body.orbit_radius, origin);
     let mut handle = nodes.remove(&body.name.to_string()).unwrap();
     if let Some(ref satelites) = body.satelites {
@@ -157,11 +157,11 @@ fn move_bodies(nodes: &mut HashMap<String, SceneNode>, body: &Body, origin: &Vec
     nodes.insert(body.name.to_string(), handle);
 }
 
-fn get_coordinates(day: u64, orbit_period: u64, scale: f32, origin: &Vector3<f32>) -> Vector3<f32> {
+fn get_coordinates(day: u64, orbit_period: u64, scale: f32, origin: &Translation3<f32>) -> Translation3<f32> {
     let fraction = (day % orbit_period) as f32 / orbit_period as f32;
     let in_rads = fraction * std::f32::consts::PI * 2.0f32;
-    let x = in_rads.sin() * scale;
-    let y = 0.0;
-    let z = in_rads.cos() * scale;
-    return Vector3::new(x, y, z) + *origin;
+    let x = in_rads.sin() * scale + origin.x;
+    let y = 0.0 + origin.y;
+    let z = in_rads.cos() * scale + origin.z;
+    return Translation3::new(x, y, z);
 }
